@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Role-based access control (RBAC)
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == 'SUPER_ADMIN';
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (getUserRole() == 'ADMIN' || getUserRole() == 'SUPER_ADMIN');
+    }
+    
+    function isAnalyst() {
+      return isAuthenticated() && (getUserRole() == 'ANALYST' || isAdmin());
+    }
+
+    function isViewer() {
+      return isAuthenticated(); // For now, all authenticated users are at least viewers
+    }
+
+    match /users/{userId} {
+      allow read: if isSuperAdmin() || request.auth.uid == userId;
+      allow write: if isSuperAdmin();
+    }
+
+    match /target_models/{document=**} {
+      allow read: if isViewer();
+      allow write: if isAdmin();
+    }
+
+    match /sources/{document=**} {
+      allow read: if isViewer();
+      allow write: if isAdmin();
+    }
+
+    match /scan_runs/{document=**} {
+      allow read: if isViewer();
+      allow write: if isAdmin();
+    }
+
+    match /candidates/{document=**} {
+      allow read: if isAnalyst();
+      allow write: if isAdmin();
+    }
+
+    match /verified_listings/{document=**} {
+      allow read: if isViewer();
+      allow write: if isAdmin();
+    }
+
+    match /audit_events/{document=**} {
+      allow read: if isSuperAdmin();
+      allow write: if isAdmin(); // System writes these, typically through admin SDK which bypasses rules anyway
+    }
+  }
+}

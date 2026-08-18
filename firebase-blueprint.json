@@ -1,0 +1,80 @@
+{
+  "__version": "1.0.0",
+  "collections": {
+    "users": {
+      "__document_description": "User profiles and RBAC",
+      "email": "string",
+      "role": "string",
+      "createdAt": "timestamp"
+    },
+    "target_models": {
+      "__document_description": "Exact target models configured by admins",
+      "manufacturer": "string",
+      "model": "string",
+      "category": "string",
+      "aliases": "string[]",
+      "prohibitedVariants": "string[]",
+      "status": "string",
+      "createdBy": "string",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp"
+    },
+    "sources": {
+      "__document_description": "Source websites registry",
+      "name": "string",
+      "domain": "string",
+      "status": "string",
+      "lastSuccessfulScan": "timestamp",
+      "lastFailedScan": "timestamp"
+    },
+    "scan_runs": {
+      "__document_description": "Log of scheduled or manual scan executions",
+      "sourceId": "string",
+      "startTime": "timestamp",
+      "endTime": "timestamp",
+      "status": "string",
+      "candidatesCollected": "number",
+      "errors": "number"
+    },
+    "candidates": {
+      "__document_description": "Raw candidates collected before validation",
+      "sourceId": "string",
+      "state": "string",
+      "url": "string",
+      "extractedData": "map",
+      "rejectionReason": "string",
+      "createdAt": "timestamp",
+      "updatedAt": "timestamp"
+    },
+    "verified_listings": {
+      "__document_description": "Fully verified and approved listings",
+      "sourceId": "string",
+      "targetModelId": "string",
+      "url": "string",
+      "manufacturer": "string",
+      "model": "string",
+      "category": "string",
+      "price": "number",
+      "currency": "string",
+      "year": "number",
+      "hours": "number",
+      "location": "string",
+      "seller": "string",
+      "phone": "string",
+      "email": "string",
+      "status": "string",
+      "primaryImage": "string",
+      "images": "string[]",
+      "firstDiscovered": "timestamp",
+      "lastVerified": "timestamp"
+    },
+    "audit_events": {
+      "__document_description": "Immutable audit log of administrative actions",
+      "userId": "string",
+      "action": "string",
+      "resource": "string",
+      "timestamp": "timestamp",
+      "details": "map"
+    }
+  }
+}
