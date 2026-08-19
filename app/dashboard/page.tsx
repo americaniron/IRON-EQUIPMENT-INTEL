@@ -86,7 +86,7 @@ export default function Dashboard() {
             ) : (
                <div className="divide-y divide-slate-100">
                   {recent.map(item => (
-                     <div key={item.id} className="py-2 flex items-center justify-between text-xs">
+                     <a href={item.url} target="_blank" rel="noopener noreferrer" key={item.id} className="py-2 px-2 -mx-2 rounded-sm flex items-center justify-between text-xs hover:bg-slate-50 transition-colors cursor-pointer block">
                         <div>
                            <div className="font-bold text-slate-800">{item.manufacturer} {item.model}</div>
                            <div className="text-[10px] text-slate-500">{item.sourceId} • {item.location}</div>
@@ -95,7 +95,7 @@ export default function Dashboard() {
                            <div className="font-bold text-slate-900">${item.price?.toLocaleString()}</div>
                            <div className="text-[10px] text-green-600 font-semibold">VERIFIED</div>
                         </div>
-                     </div>
+                     </a>
                   ))}
                </div>
             )}

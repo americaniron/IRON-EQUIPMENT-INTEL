@@ -112,7 +112,11 @@ export default function NewToday() {
                   </td>
                 </tr>
               ) : filtered.map(m => (
-                <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                <tr 
+                  key={m.id} 
+                  onClick={() => window.open(m.url, '_blank')}
+                  className="hover:bg-slate-50 transition-colors cursor-pointer"
+                >
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-8 bg-slate-100 rounded-sm overflow-hidden relative border border-slate-200 shrink-0">
@@ -166,7 +170,7 @@ export default function NewToday() {
                   <td className="px-4 py-2.5 text-right">
                     <div className="inline-flex items-center gap-2">
                       <button
-                        onClick={() => setInspectListing(m)}
+                        onClick={(e) => { e.stopPropagation(); setInspectListing(m); }}
                         className="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-800 rounded-sm text-[11px] font-bold transition-colors"
                       >
                         <Sparkles className="w-3 h-3 text-orange-600" /> AI Appraisal
