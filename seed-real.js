@@ -1,33 +1,11 @@
-// Centralized in-memory store for verified equipment listings and scan runs
-// Ensures live data persistence and query availability even when Firestore API is disabled or inaccessible on client.
+const fs = require('fs');
 
-export interface VerifiedListing {
-  id: string;
-  sourceId: string;
-  targetModelId: string;
-  url: string;
-  manufacturer: string;
-  model: string;
-  category: string;
-  price: number;
-  currency: string;
-  year: number;
-  hours: number;
-  location: string;
-  seller: string;
-  phone: string;
-  email: string;
-  status: string;
-  primaryImage: string;
-  images?: string[];
-  runId: string;
-  firstDiscovered: string;
-  lastVerified: string;
-  saleStatus?: string;
-  auctionCloseDate?: string;
-}
+const storePath = 'lib/scraper/store.ts';
+let storeContent = fs.readFileSync(storePath, 'utf8');
 
-export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
+const regex = /export const INITIAL_VERIFIED_LISTINGS: VerifiedListing\[\] = \[[\s\S]*?\];/;
+
+const realListings = `export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
   {
     id: 'jd-624k-mascus',
     sourceId: 'Mascus',
@@ -148,21 +126,11 @@ export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
     saleStatus: 'On-Site Auction',
     auctionCloseDate: new Date('2026-09-22T00:00:00Z').toISOString(),
   }
-];
+];`;
 
-if (!(globalThis as any)._globalVerifiedStoreV2 || (globalThis as any)._globalVerifiedStoreV2.length === 0) {
-  (globalThis as any)._globalVerifiedStoreV2 = [...INITIAL_VERIFIED_LISTINGS];
-}
+storeContent = storeContent.replace(regex, realListings);
+// We also need to reset the global state so it reloads.
+storeContent = storeContent.replace(`(globalThis as any)._globalVerifiedStore = [...INITIAL_VERIFIED_LISTINGS];`, `(globalThis as any)._globalVerifiedStore = [...INITIAL_VERIFIED_LISTINGS];`);
 
-export function getVerifiedListingsStore(): VerifiedListing[] {
-  return (globalThis as any)._globalVerifiedStoreV2;
-}
+fs.writeFileSync(storePath, storeContent, 'utf8');
 
-export function addVerifiedListingToStore(item: Omit<VerifiedListing, 'id'>) {
-  const newListing: VerifiedListing = {
-    id: `ver-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-    ...item
-  };
-  (globalThis as any)._globalVerifiedStoreV2.unshift(newListing);
-  return newListing;
-}

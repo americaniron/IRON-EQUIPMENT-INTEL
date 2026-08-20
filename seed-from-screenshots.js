@@ -1,33 +1,9 @@
-// Centralized in-memory store for verified equipment listings and scan runs
-// Ensures live data persistence and query availability even when Firestore API is disabled or inaccessible on client.
+const fs = require('fs');
 
-export interface VerifiedListing {
-  id: string;
-  sourceId: string;
-  targetModelId: string;
-  url: string;
-  manufacturer: string;
-  model: string;
-  category: string;
-  price: number;
-  currency: string;
-  year: number;
-  hours: number;
-  location: string;
-  seller: string;
-  phone: string;
-  email: string;
-  status: string;
-  primaryImage: string;
-  images?: string[];
-  runId: string;
-  firstDiscovered: string;
-  lastVerified: string;
-  saleStatus?: string;
-  auctionCloseDate?: string;
-}
+const storePath = 'lib/scraper/store.ts';
+let storeContent = fs.readFileSync(storePath, 'utf8');
 
-export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
+const realListings = `export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
   {
     id: 'jd-624k-mascus',
     sourceId: 'Mascus',
@@ -148,21 +124,13 @@ export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [
     saleStatus: 'On-Site Auction',
     auctionCloseDate: new Date('2026-09-22T00:00:00Z').toISOString(),
   }
-];
+];`;
 
-if (!(globalThis as any)._globalVerifiedStoreV2 || (globalThis as any)._globalVerifiedStoreV2.length === 0) {
-  (globalThis as any)._globalVerifiedStoreV2 = [...INITIAL_VERIFIED_LISTINGS];
-}
-
-export function getVerifiedListingsStore(): VerifiedListing[] {
-  return (globalThis as any)._globalVerifiedStoreV2;
-}
-
-export function addVerifiedListingToStore(item: Omit<VerifiedListing, 'id'>) {
-  const newListing: VerifiedListing = {
-    id: `ver-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-    ...item
-  };
-  (globalThis as any)._globalVerifiedStoreV2.unshift(newListing);
-  return newListing;
+const splitStr = 'export const INITIAL_VERIFIED_LISTINGS: VerifiedListing[] = [';
+const parts = storeContent.split(splitStr);
+if (parts.length === 2) {
+  // We need to find the end of the array.
+  // Actually, let's just replace everything from `export const INITIAL_VERIFIED_LISTINGS:` to the end of the file.
+  // Wait, there might be other exports at the bottom?
+  // Let's check store.ts structure
 }
