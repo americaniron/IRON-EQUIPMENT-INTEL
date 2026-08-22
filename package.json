@@ -7,7 +7,8 @@
     "build": "NODE_ENV=production next build",
     "start": "node --experimental-strip-types server.ts",
     "lint": "eslint .",
-    "clean": "next clean"
+    "clean": "next clean",
+    "build:cf": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -29,6 +30,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",

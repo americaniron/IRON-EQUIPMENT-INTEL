@@ -51,11 +51,19 @@ export function EquipmentAIAnalysisModal({ isOpen, onClose, listing }: Equipment
         if (data.success && data.analysis) {
           setAnalysis(data.analysis);
         } else {
-          setError(data.error || 'Failed to complete AI analysis');
+          let errorMsg = data.error || 'Failed to complete AI analysis';
+          if (errorMsg.includes('resource_exhausted') || errorMsg.includes('Quota exceeded') || res.status === 429) {
+            errorMsg = 'Gemini API Rate Limit Exceeded: You have exhausted your current AI Studio token quota. Please wait for the quota to refresh or check your API billing tier in Google Cloud.';
+          }
+          setError(errorMsg);
         }
       } catch (err: any) {
         if (!isMounted) return;
-        setError(err?.message || 'Network error while analyzing equipment');
+        let errorMsg = err?.message || 'Network error while analyzing equipment';
+        if (errorMsg.includes('resource_exhausted') || errorMsg.includes('Quota exceeded')) {
+            errorMsg = 'Gemini API Rate Limit Exceeded: You have exhausted your current AI Studio token quota. Please wait for the quota to refresh or check your API billing tier in Google Cloud.';
+        }
+        setError(errorMsg);
       } finally {
         if (isMounted) setLoading(false);
       }

@@ -51,19 +51,70 @@ export default function VerifiedMatches() {
     (m.sourceId || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const exportToCSV = () => {
+    if (filtered.length === 0) return;
+
+    const headers = [
+      'ID', 'Source', 'URL', 'Manufacturer', 'Model', 'Category', 
+      'Price', 'Currency', 'Year', 'Hours', 'Location', 'Seller', 
+      'Phone', 'Email', 'Sale Status', 'Auction Close Date'
+    ];
+
+    const rows = filtered.map(m => [
+      m.id || '',
+      m.sourceId || '',
+      m.url || '',
+      m.manufacturer || '',
+      m.model || '',
+      m.category || '',
+      m.price?.toString() || '0',
+      m.currency || 'USD',
+      m.year?.toString() || '',
+      m.hours?.toString() || '',
+      `"${(m.location || '').replace(/"/g, '""')}"`,
+      `"${(m.seller || '').replace(/"/g, '""')}"`,
+      m.phone || '',
+      m.email || '',
+      m.saleStatus || '',
+      m.auctionCloseDate ? new Date(m.auctionCloseDate).toLocaleDateString() : ''
+    ]);
+
+    const csvContent = [headers.join(',')]
+      .concat(rows.map(e => e.join(',')))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `verified-matches-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
          <h1 className="text-lg font-bold text-slate-800">Verified Matches</h1>
-         <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-               type="text" 
-               placeholder="Search model, seller, source..."
-               className="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-sm text-xs focus:ring-1 focus:ring-slate-400 focus:outline-none bg-white"
-               value={searchTerm}
-               onChange={e => setSearchTerm(e.target.value)}
-            />
+         <div className="flex items-center gap-2 w-full sm:w-auto">
+           <button 
+             onClick={exportToCSV}
+             className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-sm whitespace-nowrap"
+           >
+             Export to CSV
+           </button>
+           <div className="relative w-full sm:w-64">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                 type="text" 
+                 placeholder="Search model, seller, source..."
+                 className="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-sm text-xs focus:ring-1 focus:ring-slate-400 focus:outline-none bg-white"
+                 value={searchTerm}
+                 onChange={e => setSearchTerm(e.target.value)}
+              />
+           </div>
          </div>
       </div>
 
